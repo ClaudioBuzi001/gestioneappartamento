@@ -96,4 +96,56 @@ public class AppartamentoDAO {
 		return result;
 	}
 
+	public int update(Appartamento appartamento) {
+		if (appartamento == null) {
+			throw new RuntimeException("Errore articolo in input errato");
+		}
+
+		int result = -1;
+		try (Connection c = MyConnection.getConnection();
+				PreparedStatement ps = c.prepareStatement(
+						"update appartamento set quartiere = ?, metriquadrati = ?, prezzo = ?, datacreazione = ? where id = ?;")) {
+			// Setto le varie proprieta
+			ps.setString(1, appartamento.getQuartiere());
+			ps.setInt(2, appartamento.getMetriQuadrati());
+			ps.setInt(3, appartamento.getPrezzo());
+			ps.setDate(4, new java.sql.Date(appartamento.getDataCreazione().getTime()));
+			// where
+			ps.setLong(5, appartamento.getId());
+
+			result = ps.executeUpdate();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+		return result;
+	}
+	
+	public int delete(Appartamento appartamento) {
+		if (appartamento == null || appartamento.getId() < 1) {
+			throw new RuntimeException("Errore appartamento in input errato");
+		}
+
+		int result = 0;
+		try (Connection c = MyConnection.getConnection();
+				PreparedStatement ps = c.prepareStatement("delete from appartamento where id = ?;")) {
+
+			ps.setLong(1, appartamento.getId());
+
+			result = ps.executeUpdate();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+		return result;
+	}
+	
+	//public List<Appartamento> findByExample(Appartamento example){
+		
+		
+		
+	//}
+
 }

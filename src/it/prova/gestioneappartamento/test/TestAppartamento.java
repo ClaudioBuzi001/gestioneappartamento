@@ -16,12 +16,18 @@ public class TestAppartamento {
 
 		// TEST LIST
 		testList(connettore);
-		
+
 		// Test findById
 		testFindById(connettore);
-		
-		//Test insert
-		testInsert(connettore);
+
+		// Test insert
+		// testInsert(connettore); //COMMENTATO PER NON PARTIRE SEMPRE NEL MAIN
+
+		// test Update
+		testUpdate(connettore);
+
+		// test Delete
+		// testDelete(connettore); //COMMENTATO PER NON PARTIRE SEMPRE NEL MAIN
 
 	}
 
@@ -53,11 +59,11 @@ public class TestAppartamento {
 		System.out.println("_---------FINE testFindById PASSED-----------_");
 
 	}
-	
+
 	public static void testInsert(AppartamentoDAO connettore) {
 		System.out.println("_------------------INIZIO testInsert-----------_");
 		Date dataDaInserire = null;
-		
+
 		try {
 			dataDaInserire = new SimpleDateFormat("dd/MM/yyyy").parse("12/07/2001");
 		} catch (ParseException e) {
@@ -65,41 +71,42 @@ public class TestAppartamento {
 			e.printStackTrace();
 		}
 		Appartamento appartamentoDaInserire = new Appartamento("Piazza Sempione", 220, 475000, dataDaInserire);
-		
+
 		int result = connettore.insert(appartamentoDaInserire);
-		if(result == 0)
+		if (result == 0)
 			System.out.println("_----------testInsert FAILED------------_");
-		
+
 		System.out.println("_----------testInsert PASSED-------------_");
-		
-		
+
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+	private static void testUpdate(AppartamentoDAO connettore) {
+		System.out.println("_-----------testUpdate---------_");
+		Appartamento result = connettore.findById(4L);
+		result.setQuartiere("Trastevere");
+		result.setPrezzo(1000000);
+
+		int conta = connettore.update(result);
+		if (conta == 0)
+			System.out.println("_---------testUpdate FAILED------------_");
+
+		System.out.println(connettore.findById(4L).getQuartiere() + " " + connettore.findById(4L).getPrezzo());
+
+		System.out.println("_-----------testUpdate Passed--------------_");
+
+	}
+
+	private static void testDelete(AppartamentoDAO connettore) {
+		System.out.println("_-------------testDelete-------------_");
+		Appartamento result = connettore.findById(2L);
+		System.out.println("Size lista prima del delete: " + connettore.list().size());
+		int conta = connettore.delete(result);
+		if (conta == 0) {
+			System.out.println("_-------testDelete FAILED------------_");
+		}
+
+		System.out.println("Size lista dop del delete: " + connettore.list().size());
+		System.out.println("_----------testDelete PASSED------------_");
+	}
 
 }
