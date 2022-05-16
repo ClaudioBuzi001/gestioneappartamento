@@ -3,6 +3,7 @@ package it.prova.gestioneappartamento.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
@@ -121,7 +122,7 @@ public class AppartamentoDAO {
 		}
 		return result;
 	}
-	
+
 	public int delete(Appartamento appartamento) {
 		if (appartamento == null || appartamento.getId() < 1) {
 			throw new RuntimeException("Errore appartamento in input errato");
@@ -141,11 +142,106 @@ public class AppartamentoDAO {
 		}
 		return result;
 	}
-	
-	//public List<Appartamento> findByExample(Appartamento example){
-		
-		
-		
-	//}
+
+	public List<Appartamento> findByExample(Appartamento example) {
+		if (example == null )
+			throw new RuntimeException("Errore: appartamento in input non valido");
+
+		List<Appartamento> result = new ArrayList<Appartamento>();
+		boolean quartiere = false;
+		boolean metriQuadrati = false;
+		boolean prezzo = false;
+		boolean dataCreazione = false;
+		String query = "select * from appartamento ";
+
+		if (example.getQuartiere() != null && !example.getQuartiere().isEmpty()) {
+			query += "where quartiere like ? "; // da settare dopo
+			quartiere = true;
+
+		}
+		if (example.getPrezzo() > 0) {
+
+			if (quartiere) {
+				query += " and ";
+
+			} else {
+				query += " where ";
+
+			}
+
+			query += " prezzo > ? ";
+			prezzo = true;
+
+		}
+		if (example.getMetriQuadrati() > 0) {
+
+			if (quartiere || prezzo) {
+				query += " and ";
+
+			} else {
+				query += " where ";
+
+			}
+
+			query += " metriquadrati > ? ";
+			metriQuadrati = true;
+
+		}
+		if (example.getDataCreazione() != null) {
+			if (quartiere || prezzo || metriQuadrati) {
+				query += " and ";
+			} else {
+				query += " where ";
+			}
+
+			query += " datacreazione > ?";
+			dataCreazione = true;
+		}
+		query += ";";
+
+		try (Connection c = MyConnection.getConnection(); PreparedStatement ps = c.prepareStatement(query)) {
+			// settare i vari parametri ? della query
+			int indice = 1;
+			if (quartiere) {
+				ps.setString(indice, example.getQuartiere() + "%");
+				indice++;
+			}
+
+			if (prezzo) {
+				ps.setInt(indice, example.getPrezzo());
+				indice++;
+			}
+			if (metriQuadrati) {
+				ps.setInt(indice, example.getMetriQuadrati());
+				indice++;
+			}
+			if (dataCreazione) {
+				ps.setDate(indice, new java.sql.Date(example.getDataCreazione().getTime()));
+				indice++;
+			}
+			// mandiamno la query
+			try (ResultSet rs = ps.executeQuery()) {
+				while (rs.next()) {
+					Appartamento temp = new Appartamento();
+					temp.setId(rs.getLong("id"));
+					temp.setQuartiere(rs.getString("quartiere"));
+					temp.setPrezzo(rs.getInt("prezzo"));
+					temp.setMetriQuadrati(rs.getInt("metriquadrati"));
+					temp.setDataCreazione(rs.getDate("datacreazione"));
+					result.add(temp);
+				}
+
+			}
+
+			// controllo se ha quartiere
+			// se si mi metto la variabile quartiere a true e mi aggiungo alla stringa il
+			// coso
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return result;
+	}
 
 }

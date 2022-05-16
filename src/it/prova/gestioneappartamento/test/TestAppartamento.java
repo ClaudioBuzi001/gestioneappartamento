@@ -28,6 +28,7 @@ public class TestAppartamento {
 
 		// test Delete
 		// testDelete(connettore); //COMMENTATO PER NON PARTIRE SEMPRE NEL MAIN
+		testFindByExample(connettore);
 
 	}
 
@@ -109,4 +110,18 @@ public class TestAppartamento {
 		System.out.println("_----------testDelete PASSED------------_");
 	}
 
+	private static void testFindByExample(AppartamentoDAO connettore) {
+		System.out.println("_--------------Inizio testFindByExample-------------_");
+		
+		Appartamento res = new Appartamento();
+		res.setQuartiere("tra");
+		res.setPrezzo(2000);
+		res.setDataCreazione(null);
+		res.setId(2L);
+		res.setMetriQuadrati(60);
+		List<Appartamento> result = connettore.findByExample(res);
+		for(Appartamento r : result) {
+			System.out.println(r.getQuartiere()+" prezzo: "+ r.getPrezzo()+ " ,metri quadri: "+ r.getMetriQuadrati());
+		}
+	}
 }
